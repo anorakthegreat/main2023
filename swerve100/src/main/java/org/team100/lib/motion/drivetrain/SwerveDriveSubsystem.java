@@ -30,7 +30,7 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
     private final SwerveLocal m_swerveLocal;
     private final HolonomicDriveController2 m_controller;
     private final HolonomicDriveRegulator m_regulator = new HolonomicDriveRegulator();
-
+    private ChassisSpeeds m_targetChasis = new ChassisSpeeds();
     // TODO: this looks broken
     public double keyList = -1;
 
@@ -78,7 +78,10 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
     /**
      * Give the controller a new reference state.
      */
-    public void setDesiredState(SwerveState desiredState) {
+    public void 
+    
+    
+    setDesiredState(SwerveState desiredState) {
         m_desiredState = desiredState;
     }
 
@@ -99,8 +102,6 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
         return this;
     }
 
-    ////////////////////////////////////////////////////////////////////
-
     private void updateOdometry() {
         m_poseEstimator.update(m_heading.getHeadingNWU(), m_swerveLocal.positions());
         // {
@@ -117,8 +118,8 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
                 newEstimate.getY(),
                 newEstimate.getRotation().getDegrees()
         });
-        poseXPublisher.set(Units.metersToInches(newEstimate.getX()));
-        poseYPublisher.set(Units.metersToInches(newEstimate.getY()));
+        poseXPublisher.set(newEstimate.getX());
+        poseYPublisher.set(newEstimate.getY());
         poseRotPublisher.set(newEstimate.getRotation().getRadians());
         headingWUPublisher.set(m_heading.getHeadingRateNWU());
         // System.out.println(m_heading.getHeadingRateNWU());
@@ -149,6 +150,17 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
     private void driveInFieldCoords(Twist2d twist) {
         ChassisSpeeds targetChassisSpeeds = m_frameTransform.fromFieldRelativeSpeeds(
                 twist.dx, twist.dy, twist.dtheta, getPose().getRotation());
+
+
+        // System.out.println(targetChassisSpeeds);
+
+        m_targetChasis = targetChassisSpeeds;
+
+        chasisX.set(twist.dx);
+        chasisY.set(twist.dy);
+        chasisTheta.set(twist.dtheta);
+
+
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
     }
 
@@ -232,6 +244,9 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
     private final DoublePublisher poseXPublisher = pose.getDoubleTopic("x").publish();
     private final DoublePublisher poseYPublisher = pose.getDoubleTopic("y").publish();
     private final DoublePublisher poseRotPublisher = pose.getDoubleTopic("theta").publish();
+    private final DoublePublisher chasisX = pose.getDoubleTopic("chasisX").publish();
+    private final DoublePublisher chasisY = pose.getDoubleTopic("chasisY").publish();
+    private final DoublePublisher chasisTheta = pose.getDoubleTopic("chasisTheta").publish();
 
     private final DoublePublisher headingWUPublisher = pose.getDoubleTopic("Heading NWU").publish();
 

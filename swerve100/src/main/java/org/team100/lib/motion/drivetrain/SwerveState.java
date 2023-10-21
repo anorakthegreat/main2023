@@ -5,7 +5,7 @@ import org.team100.lib.controller.State100;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 
-public class SwerveState {
+public class  SwerveState {
     private final State100 m_x;
     private final State100 m_y;
     private final State100 m_theta;

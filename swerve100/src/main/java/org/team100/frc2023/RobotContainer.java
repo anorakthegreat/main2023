@@ -87,7 +87,7 @@ public class RobotContainer implements Sendable {
         //
         //////////////////////////////////////
 
-        public double kDriveCurrentLimit = SHOW_MODE ? 20 : 60;
+        public double kDriveCurrentLimit = 30;
 
         public boolean useSetpointGenerator = false;
     }
@@ -98,7 +98,7 @@ public class RobotContainer implements Sendable {
     private final AllianceSelector m_allianceSelector;
 
     // CONFIG
-    private final DriverStation.Alliance m_alliance;
+    private DriverStation.Alliance m_alliance;
 
     // SUBSYSTEMS
     private final Heading m_heading;
@@ -162,6 +162,8 @@ public class RobotContainer implements Sendable {
                 VecBuilder.fill(0.5, 0.5, 0.5),
                 VecBuilder.fill(0.4, 0.4, 0.4)); // note tight rotation variance here, used to be MAX_VALUE
 
+        m_alliance = DriverStation.Alliance.Blue;
+
         if (m_alliance == DriverStation.Alliance.Blue) {
             layout = AprilTagFieldLayoutWithCorrectOrientation.blueLayout();
         } else { // red
@@ -200,17 +202,17 @@ public class RobotContainer implements Sendable {
         ////////////////////////////
         // DRIVETRAIN COMMANDS
         // control.autoLevel(new AutoLevel(false, m_robotDrive, ahrsclass));
-        if (m_alliance == DriverStation.Alliance.Blue) {
-            control.driveToLeftGrid(toTag(controller, 6, 1.25, 0));
-            control.driveToCenterGrid(toTag(controller, 7, 0.95, .55));
-            control.driveToRightGrid(toTag(controller, 8, 0.95, .55));
-            control.driveToSubstation(toTag(controller, 4, 0.53, -0.749));
-        } else {
-            control.driveToLeftGrid(toTag(controller, 1, 0.95, .55));
-            control.driveToCenterGrid(toTag(controller, 2, 0.95, .55));
-            control.driveToRightGrid(toTag(controller, 3, 0.95, .55));
-            control.driveToSubstation(toTag(controller, 5, 0.9, -0.72));
-        }
+        // if (m_alliance == DriverStation.Alliance.Blue) {
+        //     control.driveToLeftGrid(toTag(controller, 6, 1.25, 0));
+        //     control.driveToCenterGrid(toTag(controller, 7, 0.95, .55));
+        //     control.driveToRightGrid(toTag(controller, 8, 0.95, .55));
+        //     control.driveToSubstation(toTag(controller, 4, 0.53, -0.749));
+        // } else {
+        //     control.driveToLeftGrid(toTag(controller, 1, 0.95, .55));
+        //     control.driveToCenterGrid(toTag(controller, 2, 0.95, .55));
+        //     control.driveToRightGrid(toTag(controller, 3, 0.95, .55));
+        //     control.driveToSubstation(toTag(controller, 5, 0.9, -0.72));
+        // }
         control.defense(new Defense(m_robotDrive));
         control.resetRotation0(new ResetRotation(m_robotDrive, new Rotation2d(0)));
         control.resetRotation180(new ResetRotation(m_robotDrive, Rotation2d.fromDegrees(180)));
@@ -218,7 +220,7 @@ public class RobotContainer implements Sendable {
         control.driveSlow(new DriveScaled(control::twist, m_robotDrive, slow));
         SpeedLimits medium = new SpeedLimits(2.0, 2.0, 0.5, 1.0);
         control.driveMedium(new DriveScaled(control::twist, m_robotDrive, medium));
-        control.resetPose(new ResetPose(m_robotDrive, 0, 0, 0));
+        control.resetPose(new ResetPose(m_robotDrive, 0, 0, Math.PI));
         control.tapeDetect(new DriveToRetroReflectiveTape(m_robotDrive, speedLimits));
         control.rotate0(new Rotate(m_robotDrive, m_heading, speedLimits, new Timer(), 0));
 
@@ -273,7 +275,8 @@ public class RobotContainer implements Sendable {
                     new DriveScaled(
                             control::twist,
                             m_robotDrive,
-                            speedLimits));
+                            SpeedLimitsFactory.get(identity, false))
+            );
         } else {
             if (m_config.useSetpointGenerator) {
                 m_robotDrive.setDefaultCommand(

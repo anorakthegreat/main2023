@@ -89,9 +89,9 @@ public class DualXboxControl implements Control, Sendable {
 
     @Override
     public Twist2d twist() {
-        double dx = expo(deadband(1.0 * clamp(controller0.getRightY(), 1), m_config.kDeadband, 1), m_config.kExpo);
-        double dy = expo(deadband(1.0 * clamp(controller0.getRightX(), 1), m_config.kDeadband, 1), m_config.kExpo);
-        double dtheta = expo(deadband(1.0 * clamp(controller0.getLeftX(), 1), m_config.kDeadband, 1), m_config.kExpo);
+        double dx = expo(deadband(-1.0 * clamp(controller0.getRightY(), 1), m_config.kDeadband, 1), m_config.kExpo);
+        double dy = expo(deadband(-1.0 * clamp(controller0.getRightX(), 1), m_config.kDeadband, 1), m_config.kExpo);
+        double dtheta = expo(deadband(-1.0 * clamp(controller0.getLeftX(), 1), m_config.kDeadband, 1), m_config.kExpo);
         return new Twist2d(dx, dy, dtheta);
     }
 
@@ -181,8 +181,13 @@ public class DualXboxControl implements Control, Sendable {
     }
 
     public void driveWith254Trajec(Command command){
+        // controller0.a().whileTrue(command);
+    }
+
+    public void circle(Command command){
         controller0.a().whileTrue(command);
     }
+
 
     ///////////////////////////////
     //

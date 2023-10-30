@@ -2,10 +2,21 @@ package org.team100.frc2023.autonomous;
 
 import java.util.List;
 
+import javax.swing.plaf.DesktopIconUI;
+
 import org.team100.frc2023.LQRManager;
 import org.team100.frc2023.commands.GoalOffset;
+import org.team100.lib.config.Identity;
+import org.team100.lib.controller.DriveControllers;
+import org.team100.lib.controller.DriveControllersFactory;
+import org.team100.lib.controller.HolonomicDriveController2;
+import org.team100.lib.controller.State100;
+import org.team100.lib.motion.drivetrain.SpeedLimits;
+import org.team100.lib.motion.drivetrain.SpeedLimitsFactory;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 import org.team100.lib.motion.drivetrain.SwerveState;
+
+import com.ctre.phoenix.CANifier.PWMChannel;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
@@ -33,6 +44,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -61,7 +73,9 @@ public class DriveToWaypoint3 extends Command {
 
     private final PIDController xController;
     private final PIDController yController;
-    private final HolonomicLQR m_controller;
+    // private final HolonomicLQR m_controller;
+    private final HolonomicDriveController2 m_controller;
+
     private GoalOffset previousOffset;
     private Trajectory m_trajectory;
     private boolean isFinished = false;
@@ -134,8 +148,15 @@ public class DriveToWaypoint3 extends Command {
 
         // m_controller = new HolonomicDriveController2(xController, yController,
         // m_rotationController, m_gyro);
-        m_controller = new HolonomicLQR(m_swerve, xManager, yManager, m_rotationController);
-        // m_controller = new HolonomicDriveController2(xController, yController,
+        // m_controller = new HolonomicLQR(m_swerve, xManager, yManager, m_rotationController);
+        // m_controller = new HolonomicDriveController2(xController, yController);
+        
+        Identity identity = Identity.get();
+        SpeedLimits speedLimits = new SpeedLimits(2, 2, 1, 1);
+
+        DriveControllers controllers = new DriveControllersFactory().get(identity, speedLimits);
+
+        m_controller = new HolonomicDriveController2(controllers);
         // m_rotationController, m_gyro);
 
         // globalGoalTranslation = new Translation2d();
@@ -146,7 +167,7 @@ public class DriveToWaypoint3 extends Command {
 
         // SmartDashboard.putData("Drive To Waypoint", this);
 
-        translationConfig = new TrajectoryConfig(5, 4.5).setKinematics(kinematics);
+        translationConfig = new TrajectoryConfig(2, 2).setKinematics(kinematics);
         addRequirements(drivetrain);
     }
 
@@ -178,17 +199,22 @@ public class DriveToWaypoint3 extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("STTTTTTTTTTTTTTTAAAARTTTTTTTTt");
+
         isFinished = false;
         m_timer.restart();
         count = 0;
-        m_controller.reset(m_swerve.getPose());
-        m_controller.updateProfile(m_goal.getX(), m_goal.getY(), 5, 3, 1);
-        m_controller.start();
+        // m_controller.reset(m_swerve.getPose());
+        // m_controller.updateProfile(m_goal.getX(), m_goal.getY(), 5, 3, 1);
+        // m_controller.start();
         m_trajectory = makeTrajectory(previousOffset, 0);
+        System.out.println(m_trajectory);
 
     }
 
     public void execute() {
+
+        isFinished = false;
         // if (m_trajectory == null) {
         // return;
         // }
@@ -202,13 +228,50 @@ public class DriveToWaypoint3 extends Command {
         // return;
         // }
         double curTime = m_timer.get();
-        State desiredState = m_trajectory.sample(curTime);
 
+        if(m_trajectory != null){
+            State desiredState = m_trajectory.sample(curTime);
+
+        
+                  
         Pose2d currentPose = m_swerve.getPose();
+
+        // System.out.println(desiredState);
+
+        if(currentPose.getX() > m_goal.getX() - 0.2 && currentPose.getX() < m_goal.getX() + 0.2){
+            if(currentPose.getY() > m_goal.getY() - 0.2 && currentPose.getY() < m_goal.getY() + 0.2){
+                System.out.println("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+                System.out.println(desiredState.poseMeters.getY());
+                System.out.println(m_goal.getY());
+
+                
+                isFinished = true;
+            } else{
+                System.out.println("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+                isFinished = false;
+            }
+        } else {
+            isFinished = false;
+            System.out.println("BAHAHAHAHAHAHAHAHAHH");
+        }
+
+        
+
+        // System.out.println(currentPose);
+        // Twist2d fieldRelativeTarget = m_controller.calculate(
+        //         currentPose,
+        //         desiredState,
+        //         m_goal.getRotation());
+        SwerveState des = new SwerveState(
+            new State100(desiredState.poseMeters.getX(), 0, 0),
+            new State100(desiredState.poseMeters.getY(), 0, 0),
+            new State100(currentPose.getRotation().getRadians(), 0, 0));
+        
+        
         Twist2d fieldRelativeTarget = m_controller.calculate(
                 currentPose,
-                desiredState,
-                m_goal.getRotation());
+                des
+                );
 
         SwerveState manualState = SwerveDriveSubsystem.incremental(currentPose, fieldRelativeTarget);
         m_swerve.setDesiredState(manualState);
@@ -221,16 +284,28 @@ public class DriveToWaypoint3 extends Command {
         rotSetpoint.set(m_rotationController.getSetpoint().position);
         poseRotPublisher.set(m_swerve.getPose().getRotation().getRadians());
         poseXErrorPublisher.set(xController.getPositionError());
-        poseYErrorPublisher.set(yController.getPositionError());
+        poseYErrorPublisher.set(yController.getPositionError());    
+        }
+        
     }
 
     @Override
     public boolean isFinished() {
+
+        if(isFinished){
+            System.out.println("FIIIIIIIINNNNNNNNNNNNNNNNNNNNNNNn");
+        }
         return isFinished; // keep trying until the button is released
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+        m_timer.stop();
+        m_swerve.truncate();
+    }
+
+    public void stop() {
         // System.out.println("END");
         m_timer.stop();
         m_swerve.truncate();

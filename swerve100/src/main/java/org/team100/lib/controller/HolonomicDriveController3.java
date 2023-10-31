@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class HolonomicDriveController2 {
+public class HolonomicDriveController3 {
     private final PIDController m_xController;
     private final PIDController m_yController;
     private final PIDController m_thetaController;
@@ -20,7 +20,7 @@ public class HolonomicDriveController2 {
     private Rotation2d m_rotationError = new Rotation2d();
     private Pose2d m_poseTolerance = new Pose2d();
 
-    public HolonomicDriveController2(
+    public HolonomicDriveController3(
         DriveControllers controllers) {
         m_xController = controllers.xController;
         m_yController = controllers.yController;
@@ -103,7 +103,7 @@ public class HolonomicDriveController2 {
     }
 
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    private final NetworkTable table = inst.getTable("Holonomic2");
+    private final NetworkTable table = inst.getTable("Holonomic3");
 
     private final DoublePublisher xSetPublisher = table.getDoubleTopic("xSet").publish();
     private final DoublePublisher xFFPublisher = table.getDoubleTopic("xFF").publish();

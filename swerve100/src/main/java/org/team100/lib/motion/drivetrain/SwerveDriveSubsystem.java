@@ -13,6 +13,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -67,7 +68,9 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
     public void periodic() {
         updateOdometry();
         driveToReference();
-        m_field.setRobotPose(getPose());
+
+        Pose2d newPose = new Pose2d((-1 * getPose().getX()) + 5 , (-1 * getPose().getY()) + 5, getPose().getRotation());
+        m_field.setRobotPose(newPose);
     }
 
     /** The speed implied by the module states. */
@@ -163,6 +166,10 @@ public class SwerveDriveSubsystem extends Subsystem implements SwerveDriveSubsys
 
 
         m_swerveLocal.setChassisSpeeds(targetChassisSpeeds);
+    }
+
+    public void setModuleStates(SwerveModuleState[] targetModuleStates){
+        m_swerveLocal.setModuleStates(targetModuleStates);
     }
 
     public void setChassisSpeeds(com.team254.lib.swerve.ChassisSpeeds speeds){

@@ -58,6 +58,9 @@ import org.team100.lib.retro.IlluminatorInterface;
 import org.team100.lib.sensors.RedundantGyro;
 import org.team100.lib.sensors.RedundantGyroInterface;
 import org.team100.lib.trajectory.FancyTrajectory;
+
+import com.team254.lib.swerve.DriveCancel;
+
 import org.team100.lib.trajectory.Circle;
 import org.team100.lib.trajectory.DrawCircle;
 
@@ -288,31 +291,40 @@ public class RobotContainer implements Sendable {
         ///////////////////////////
         // DRIVE
 
-        if (m_config.SHOW_MODE) {
-            m_robotDrive.setDefaultCommand(
-                    new DriveScaled(
+        control.drive(
+            new DriveScaled(
                             control::twist,
                             m_robotDrive,
                             SpeedLimitsFactory.get(identity, false))
-            );
-        } else {
-            if (m_config.useSetpointGenerator) {
-                m_robotDrive.setDefaultCommand(
-                        new DriveWithSetpointGenerator(
-                                control::twist,
-                                m_robotDrive,
-                                speedLimits));
-            } else {
-                m_robotDrive.setDefaultCommand(
-                        new DriveWithHeading(
-                                control::twist,
-                                m_robotDrive,
-                                m_heading,
-                                speedLimits,
-                                new Timer(),
-                                control::desiredRotation));
-            }
-        }
+        );
+
+        // if (m_config.SHOW_MODE) {
+        //     m_robotDrive.setDefaultCommand(
+        //             new DriveScaled(
+        //                     control::twist,
+        //                     m_robotDrive,
+        //                     SpeedLimitsFactory.get(identity, false))
+        //     );
+        // } else {
+        //     if (m_config.useSetpointGenerator) {
+        //         m_robotDrive.setDefaultCommand(
+        //                 new DriveWithSetpointGenerator(
+        //                         control::twist,
+        //                         m_robotDrive,
+        //                         speedLimits));
+        //     } else {
+        //         m_robotDrive.setDefaultCommand(
+        //                 new DriveWithHeading(
+        //                         control::twist,
+        //                         m_robotDrive,
+        //                         m_heading,
+        //                         speedLimits,
+        //                         new Timer(),
+        //                         control::desiredRotation));
+        //     }
+        // }
+
+        m_robotDrive.setDefaultCommand(new DriveCancel(m_robotDrive));
 
         /////////////////////////
         // MANIPULATOR

@@ -98,14 +98,14 @@ public class SwerveDriveKinematics {
 
         SwerveModuleState[] moduleStates = new SwerveModuleState[m_numModules];
 
-        if (Math.abs(chassisSpeeds.vxMetersPerSecond) < 0.01
-            && Math.abs(chassisSpeeds.vyMetersPerSecond) < 0.01
-            && Math.abs(chassisSpeeds.omegaRadiansPerSecond) < 0.01) {
-            for (int i = 0; i < m_numModules; i++) {
-                moduleStates[i] = new SwerveModuleState(0.0, m_moduleHeadings[i]);
-            }
-            return moduleStates;
-        }
+        // if (Math.abs(chassisSpeeds.vxMetersPerSecond) < 0.01
+        //     && Math.abs(chassisSpeeds.vyMetersPerSecond) < 0.01
+        //     && Math.abs(chassisSpeeds.omegaRadiansPerSecond) < 0.01) {
+        //     for (int i = 0; i < m_numModules; i++) {
+        //         moduleStates[i] = new SwerveModuleState(0.0, m_moduleHeadings[i]);
+        //     }
+        //     return moduleStates;
+        // }
 
         if (!centerOfRotationMeters.equals(m_prevCoR)) {
             for (int i = 0; i < m_numModules; i++) {

@@ -95,13 +95,17 @@ public class DualXboxControl implements Control, Sendable {
         return new Twist2d(dx, dy, dtheta);
     }
 
+    public void drive(Command command){
+        controller0.y().whileTrue(command);
+    }
+
     @Override
     public void driveSlow(Command command) {
         controller0.leftBumper().whileTrue(command);
     }
 
     public void resetPose(Command command) {
-        controller0.leftBumper().onTrue(command);
+        controller0.b().onTrue(command);
     }
 
     @Override

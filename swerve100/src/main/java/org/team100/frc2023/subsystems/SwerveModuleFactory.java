@@ -32,7 +32,7 @@ public class SwerveModuleFactory {
             int turningMotorCanId,
             int turningEncoderChannel,
             double turningOffset) {
-        final double kWheelDiameterMeters = 0.1015; // WCP 4 inch wheel
+        final double kWheelDiameterMeters = 0.1005; // WCP 4 inch wheel
         final double kDriveReduction = 5.50; // see wcproducts.com, this is the "fast" ratio. 
         //TODO Temperarely added a modifyer to make this more realistic through some testing, we will need to make this a real value
         final double driveEncoderDistancePerTurn = kWheelDiameterMeters * Math.PI / kDriveReduction;

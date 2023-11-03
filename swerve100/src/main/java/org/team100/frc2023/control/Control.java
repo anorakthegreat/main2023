@@ -85,6 +85,10 @@ public interface Control {
     default void driveWithLQR(Command command) {
     };
 
+    default void drive(Command command){
+
+    };
+
     ///////////////////////////////
     //
     // OPERATOR: arm and manipulator controls

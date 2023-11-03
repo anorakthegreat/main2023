@@ -5,10 +5,12 @@
 package org.team100.lib.trajectory;
 
 import org.team100.frc2023.autonomous.DriveToWaypoint3;
+import org.team100.frc2023.commands.RotateModules;
 import org.team100.lib.motion.drivetrain.SwerveDriveSubsystem;
 
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -22,11 +24,12 @@ public class DrawCircle extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
 
-    new DriveToWaypoint3(goalArr[0], drivetrain, kinematics),
-    new DriveToWaypoint3(goalArr[1], drivetrain, kinematics),
-    new DriveToWaypoint3(goalArr[2], drivetrain, kinematics),
-    new DriveToWaypoint3(goalArr[3], drivetrain, kinematics),
-    new DriveToWaypoint3(goalArr[4], drivetrain, kinematics)
+    // new DriveToWaypoint3(goalArr[0], drivetrain, kinematics),
+    // new DriveToWaypoint3(goalArr[1], drivetrain, kinematics),
+    // new DriveToWaypoint3(goalArr[2], drivetrain, kinematics),
+    // new DriveToWaypoint3(goalArr[3], drivetrain, kinematics),
+    // new DriveToWaypoint3(goalArr[4], drivetrain, kinematics)
+    new RotateModules(drivetrain, Rotation2d.fromDegrees(0))
 
 
 

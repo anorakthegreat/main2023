@@ -66,6 +66,14 @@ public class VisionDataProvider extends Subsystem implements TableEventListener 
     // for blip filtering
     private Pose2d lastRobotInFieldCoords;
 
+    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+    private final NetworkTable desired = inst.getTable("CAMERA");
+    private final DoublePublisher estimatedX8 = desired.getDoubleTopic("x8").publish();
+    private final DoublePublisher estimatedY8 = desired.getDoubleTopic("y8").publish();
+    private final DoublePublisher estimatedY1 = desired.getDoubleTopic("y1").publish();
+    private final DoublePublisher estimatedX1 = desired.getDoubleTopic("x1").publish();
+
     public VisionDataProvider(
             AprilTagFieldLayoutWithCorrectOrientation layout,
             SwerveDrivePoseEstimator poseEstimator,
@@ -141,6 +149,18 @@ public class VisionDataProvider extends Subsystem implements TableEventListener 
                     blip,
                     robotRotationInFieldCoordsFromGyro,
                     m_config.kTagRotationBeliefThresholdMeters);
+
+            if(blip.id == 8){
+                estimatedX8.set(robotPoseInFieldCoords.getX());
+                estimatedY8.set(robotPoseInFieldCoords.getY());
+
+            }
+
+            if(blip.id == 1){
+                estimatedX1.set(robotPoseInFieldCoords.getX());
+                estimatedY1.set(robotPoseInFieldCoords.getY());
+
+            }
 
             Translation2d robotTranslationInFieldCoords = robotPoseInFieldCoords.getTranslation().toTranslation2d();
             currentRobotinFieldCoords = new Pose2d(robotTranslationInFieldCoords, gyroRotation);

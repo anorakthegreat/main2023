@@ -198,7 +198,7 @@ public class SwerveLocal {
 
     ///////////////////////////////////////////////////////////
 
-    private void setModuleStates(SwerveModuleState[] targetModuleStates) {
+    public void setModuleStates(SwerveModuleState[] targetModuleStates) {
 
         // System.out.println("BALOSDHGOSDHGSOUHSOHSGOUSDHGOUH");
 
